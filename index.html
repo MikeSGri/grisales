@@ -3,90 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Take and Go Road Rebels Express</title>
     <style>
         body {
+            background-color: black;
+            color: white;
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            background-color: #f4f4f4;
-            color: #333;
         }
-        header {
-            background: #333;
-            color: white;
-            text-align: center;
-            padding: 1rem;
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
         }
         .hero {
-            text-align: center;
-            padding: 50px;
-            background: #007bff;
-            color: white;
-        }
-        .cta {
-            background: white;
-            color: #007bff;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .content {
             display: flex;
-            justify-content: space-around;
-            padding: 20px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 50px 0;
         }
-        .box {
+        .hero img {
+            max-width: 50%;
+        }
+        .hero-text {
+            text-align: right;
+        }
+        .btn {
             background: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 30%;
-            text-align: center;
+            color: black;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-weight: bold;
         }
-        footer {
-            background: #333;
-            color: white;
+        .section {
             text-align: center;
-            padding: 10px;
-            position: relative;
-            bottom: 0;
-            width: 100%;
+            padding: 50px 0;
+        }
+        .section h2 {
+            color: #1e90ff;
+        }
+        .gallery {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .gallery img {
+            width: 30%;
+            max-width: 300px;
+        }
+        .footer {
+            background: #111;
+            text-align: center;
+            padding: 20px 0;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to My Website</h1>
-    </header>
-    
-    <main>
-        <section class="hero">
-            <h2>Main Heading</h2>
-            <p>This is a placeholder for the main content. You can replace it with your text.</p>
-            <button class="cta">Learn More</button>
-        </section>
-        
-        <section class="content">
-            <div class="box">
-                <h3>Feature 1</h3>
-                <p>Short description of feature 1.</p>
+    <div class="container">
+        <div class="hero">
+            <img src="van.jpg" alt="Cargo Van">
+            <div class="hero-text">
+                <h1>SAFE FAST CARGO SHIPPING<br>COMPANY RELIABLE<br>CARGO SOLUTIONS FOR EVERY SHIPMENT</h1>
+                <p>Fast, efficient freight services you can trust.</p>
+                <a href="#" class="btn">GET A QUOTE</a>
+                <p>+1.7816541722</p>
             </div>
-            <div class="box">
-                <h3>Feature 2</h3>
-                <p>Short description of feature 2.</p>
+        </div>
+        <div class="section">
+            <h2>ABOUT TAKE AND GO ROAD REBELS EXPRESS</h2>
+            <p>Our mission is to provide reliable and efficient freight services tailored to your needs.</p>
+            <img src="mission.jpg" alt="Our Mission">
+        </div>
+        <div class="section">
+            <h2>EXPLORE OUR JOURNEY</h2>
+            <div class="gallery">
+                <img src="cargo1.jpg" alt="Cargo">
+                <img src="cargo2.jpg" alt="Cargo">
+                <img src="warehouse.jpg" alt="Warehouse">
             </div>
-            <div class="box">
-                <h3>Feature 3</h3>
-                <p>Short description of feature 3.</p>
-            </div>
-        </section>
-    </main>
-    
-    <footer>
-        <p>&copy; 2025 My Website. All rights reserved.</p>
-    </footer>
+        </div>
+        <div class="section">
+            <h2>ONLINE APPOINTMENTS</h2>
+            <p>New services are coming soon!</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2025 Take and Go Road Rebels Express</p>
+        </div>
+    </div>
 </body>
 </html>
