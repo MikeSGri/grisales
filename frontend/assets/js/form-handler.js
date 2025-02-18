@@ -29,3 +29,17 @@ document.getElementById("quoteForm").addEventListener("submit", async function(e
         alert("Failed to send quote request. Try again later.");
     }
 });
+
+document.getElementById("showForm").addEventListener("click", function(event) {
+    event.preventDefault(); // Prevents page jump on click
+
+    let formContainer = document.getElementById("quoteFormContainer");
+    
+    // Toggle form visibility
+    if (formContainer.style.display === "none") {
+        formContainer.style.display = "block";
+    } else {
+        formContainer.style.display = "none";
+    }
+});
+
