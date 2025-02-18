@@ -26,6 +26,19 @@
         .hero img {
             max-width: 50%;
         }
+        #quoteForm {
+            max-width: 600px;
+            margin: auto;
+            background: #222;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .form-row {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
         .hero-text {
             text-align: right;
         }
@@ -71,11 +84,17 @@
 
                 <div id="quoteFormContainer" style="display: none;">
                     <form id="quoteForm">
-                        <input type="text" name="name" id="name" placeholder="Your Name" required>
-                        <input type="email" name="email" id="email" placeholder="Your Email" required>
-                        <input type="tel" name="phone" id="phone" placeholder="Your Phone" required>
-                        <textarea name="message" id="message" placeholder="Your Message" required></textarea>
-                        <button type="submit" class="btn">Submit</button>
+                        <div class ="form-row">
+                            <input type="text" name="name" id="name" placeholder="Your Name" required>
+                            <input type="email" name="email" id="email" placeholder="Your Email" required>
+                            <input type="tel" name="phone" id="phone" placeholder="Your Phone" required>
+                        </div>
+                        <div class ="form-row">
+                            <textarea name="message" id="message" placeholder="Your Message" required></textarea>
+                        </div>
+                        <div class ="form-row">
+                            <button type="submit" class="btn">Submit</button>
+                        </div>
                     </form>
                 </div>
 
