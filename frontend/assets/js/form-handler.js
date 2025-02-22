@@ -1,28 +1,22 @@
 document.addEventListener("DOMContentLoaded", function() {
     console.log("JavaScript Loaded Successfully"); // Debugging check
 
-    // Ensure the "GET A QUOTE" button exists
     const showFormButton = document.getElementById("showForm");
     const formContainer = document.getElementById("quoteFormContainer");
 
     if (showFormButton && formContainer) {
         showFormButton.addEventListener("click", function(event) {
-            event.preventDefault(); // Prevents page jump on click
-            
-            console.log("Button clicked!"); // Debugging check
-            
-            // Toggle form visibility
-            if (formContainer.style.display === "none" || formContainer.style.display === "") {
-                formContainer.style.display = "block";
-            } else {
-                formContainer.style.display = "none";
-            }
+            event.preventDefault();
+            console.log("Button clicked!");
+
+            formContainer.style.display = (formContainer.style.display === "none" || formContainer.style.display === "") 
+                ? "block" 
+                : "none";
         });
     } else {
         console.error("showForm or quoteFormContainer not found!");
     }
 
-    // Ensure the form exists before adding event listener
     const quoteForm = document.getElementById("quoteForm");
 
     if (quoteForm) {
@@ -33,20 +27,16 @@ document.addEventListener("DOMContentLoaded", function() {
                 return input.replace(/[<>\/]/g, ""); // Remove HTML tags
             }
 
-            const data = {
-                name: sanitize(document.getElementById("name").value),
-                email: sanitize(document.getElementById("email").value),
-                phone: sanitize(document.getElementById("phone").value),
-                message: sanitize(document.getElementById("message").value)
-            };
+            const formData = new FormData();
+            formData.append("name", sanitize(document.getElementById("name").value));
+            formData.append("email", sanitize(document.getElementById("email").value));
+            formData.append("phone", sanitize(document.getElementById("phone").value));
+            formData.append("message", sanitize(document.getElementById("message").value));
 
             try {
-                const response = await fetch("https://speedytransportation.pro/", {
+                const response = await fetch("http://192.168.2.1:8000/send-email/", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(data)
+                    body: formData,
                 });
 
                 if (!response.ok) throw new Error("Server error");
