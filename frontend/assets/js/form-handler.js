@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const formContainer = document.getElementById("quoteFormContainer");
     const quoteForm = document.getElementById("quoteForm");
 
-    // Ensure button and form container exist
     if (showFormButton && formContainer) {
         showFormButton.addEventListener("click", function (event) {
             event.preventDefault();
@@ -19,42 +18,74 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("showForm or quoteFormContainer not found!");
     }
 
-    // Handle form submission
     if (quoteForm) {
         quoteForm.addEventListener("submit", async function (event) {
-            event.preventDefault(); // Prevent form from reloading the page
-
+            event.preventDefault();
+            
             const formData = new FormData(quoteForm);
-            console.log("Submitting form...");
+            const jsonData = {};
+            formData.forEach((value, key) => {
+                jsonData[key] = value;
+            });
 
             try {
-                const response = await fetch("https://speedytransportation.pro/send-email/", {
+                const response = await fetch("http://192.168.1.100:8000/send-email/", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
+                        "Content-Type": "application/json"
                     },
-                    body: new URLSearchParams(formData).toString(),
+                    body: JSON.stringify(jsonData),
                 });
 
-                let result;
-                try {
-                    result = await response.json(); // Try parsing JSON response
-                } catch (jsonError) {
-                    console.error("Invalid JSON response:", jsonError);
-                    throw new Error("Server returned an invalid response");
-                }
-
                 if (response.ok) {
-                    alert("Success: " + (result.message || "Email sent successfully!"));
+                    console.log("Email sent successfully!");
                 } else {
-                    alert("Error: " + (result.error || "An error occurred"));
+                    throw new Error("Backend unavailable, saving request locally.");
                 }
             } catch (error) {
-                alert("Failed to send quote request. Try again later.");
-                console.error("Fetch error:", error);
+                console.error(error);
+                saveRequestOffline(jsonData);
             }
         });
-    } else {
-        console.error("quoteForm not found!");
     }
+
+    // Save request to IndexedDB
+    function saveRequestOffline(data) {
+        const requestQueue = JSON.parse(localStorage.getItem("pendingRequests")) || [];
+        requestQueue.push(data);
+        localStorage.setItem("pendingRequests", JSON.stringify(requestQueue));
+    }
+
+    // Retry requests when backend is available
+    async function retryRequests() {
+        const requestQueue = JSON.parse(localStorage.getItem("pendingRequests")) || [];
+
+        if (requestQueue.length > 0) {
+            console.log(`Retrying ${requestQueue.length} stored requests...`);
+            for (let i = 0; i < requestQueue.length; i++) {
+                try {
+                    const response = await fetch("http://192.168.1.100:8000/send-email/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(requestQueue[i]),
+                    });
+
+                    if (response.ok) {
+                        console.log("Stored request sent successfully!");
+                        requestQueue.splice(i, 1);
+                        i--; // Adjust index after removing item
+                    }
+                } catch (error) {
+                    console.error("Backend still down, keeping requests stored.");
+                    break; // Stop retrying if backend is still unavailable
+                }
+            }
+            localStorage.setItem("pendingRequests", JSON.stringify(requestQueue));
+        }
+    }
+
+    // Retry every 30 seconds
+    setInterval(retryRequests, 30000);
 });
