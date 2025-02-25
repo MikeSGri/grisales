@@ -2,13 +2,13 @@ from fastapi import FastAPI, Form, HTTPException
 import smtplib
 from email.message import EmailMessage
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
-
 # Allow frontend (GitHub Pages) to access this API
 origins = [
-    "https://speedytransportation.pro/send-email/",  # Replace with your actual GitHub Pages URL
-    "192.168.2.1:8000/",  # For local testing
+    "https://speedytransportation.pro",  # Replace with your actual GitHub Pages URL
+    # "http://192.168.2.1:5500",  # For local testing
 
 ]
 
@@ -19,6 +19,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Handle OPTIONS request explicitly
+@app.options("/send-email/")
+async def options_handler():
+    return JSONResponse(content={}, status_code=200)
+
 
 # Gmail SMTP Settings
 SMTP_SERVER = "smtp.gmail.com"

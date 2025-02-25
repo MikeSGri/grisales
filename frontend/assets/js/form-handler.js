@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    console.log("JavaScript Loaded Successfully"); // Debugging check
+    console.log("JavaScript Loaded Successfully");
 
     const showFormButton = document.getElementById("showForm");
     const formContainer = document.getElementById("quoteFormContainer");
@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", function() {
         showFormButton.addEventListener("click", function(event) {
             event.preventDefault();
             console.log("Button clicked!");
-
             formContainer.style.display = (formContainer.style.display === "none" || formContainer.style.display === "") 
                 ? "block" 
                 : "none";
@@ -19,35 +18,31 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const quoteForm = document.getElementById("quoteForm");
 
-    if (quoteForm) {
-        quoteForm.addEventListener("submit", async function(event) {
-            event.preventDefault();
-
-            function sanitize(input) {
-                return input.replace(/[<>\/]/g, ""); // Remove HTML tags
-            }
-
-            const formData = new FormData();
-            formData.append("name", sanitize(document.getElementById("name").value));
-            formData.append("email", sanitize(document.getElementById("email").value));
-            formData.append("phone", sanitize(document.getElementById("phone").value));
-            formData.append("message", sanitize(document.getElementById("message").value));
-
-            try {
-                const response = await fetch("http://192.168.2.1:8000/send-email/", {
-                    method: "POST",
-                    body: formData,
-                });
-
-                if (!response.ok) throw new Error("Server error");
-
-                const result = await response.json();
-                alert(result.message);
-            } catch (error) {
-                alert("Failed to send quote request. Try again later.");
-            }
+    try {
+        const response = await fetch("https://speedytransportation.pro/send-email/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData.toString(),
         });
-    } else {
-        console.error("quoteForm not found!");
+    
+        let result;
+        try {
+            result = await response.json(); // Try parsing JSON response
+        } catch (jsonError) {
+            console.error("Invalid JSON response:", jsonError);
+            throw new Error("Server returned an invalid response");
+        }
+    
+        if (response.ok) {
+            alert("Success: " + (result.message || "Email sent successfully!"));
+        } else {
+            alert("Error: " + (result.error || "An error occurred"));
+        }
+    } catch (error) {
+        alert("Failed to send quote request. Try again later.");
+        console.error("Fetch error:", error);
     }
+    
 });
