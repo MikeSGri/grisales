@@ -1,34 +1,19 @@
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("JavaScript Loaded Successfully");
+async function retryRequests() {
+    let requestQueue = JSON.parse(localStorage.getItem("pendingRequests")) || [];
 
-    const showFormButton = document.getElementById("showForm");
-    const formContainer = document.getElementById("quoteFormContainer");
-    const quoteForm = document.getElementById("quoteForm");
+    if (requestQueue.length > 0) {
+        console.log(`Retrying ${requestQueue.length} stored requests...`);
 
-    if (showFormButton && formContainer) {
-        showFormButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            console.log("Button clicked!");
-            formContainer.style.display =
-                formContainer.style.display === "none" || formContainer.style.display === ""
-                    ? "block"
-                    : "none";
-        });
-    } else {
-        console.error("showForm or quoteFormContainer not found!");
-    }
+        for (let i = 0; i < requestQueue.length; i++) {
+            let request = requestQueue[i];
 
-    if (quoteForm) {
-        quoteForm.addEventListener("submit", async function (event) {
-            event.preventDefault();
-            
-            const formData = new FormData(quoteForm);
-            const jsonData = {};
-            formData.forEach((value, key) => {
-                jsonData[key] = value;
-            });
-
-            alert("Thank you! We will contact you shortly."); // Immediate feedback
+            // Stop retrying after 3 attempts
+            if (request.retryCount >= 3) {
+                console.error("Max retries reached for:", request);
+                requestQueue.splice(i, 1); // Remove it from the queue
+                i--; // Adjust index after removal
+                continue;
+            }
 
             try {
                 const response = await fetch("https://grisales-github-io.onrender.com/send-email/", {
@@ -36,58 +21,25 @@ document.addEventListener("DOMContentLoaded", function () {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: formData,
+                    body: JSON.stringify(request),
                 });
 
                 if (response.ok) {
-                    console.log("Email sent successfully!");
+                    console.log("Stored request sent successfully!");
+                    requestQueue.splice(i, 1); // Remove successful request
+                    i--; // Adjust index after removal
                 } else {
-                    throw new Error("Backend unavailable, saving request locally.");
+                    request.retryCount += 1; // Increment retry counter
                 }
             } catch (error) {
-                console.error(error);
-                saveRequestOffline(jsonData);
+                console.error("Backend still down, keeping requests stored.");
+                request.retryCount += 1; // Increment retry counter
             }
-        });
-    }
+        }
 
-    // Save request to IndexedDB instead of localStorage
-    function saveRequestOffline(data) {
-        const requestQueue = JSON.parse(localStorage.getItem("pendingRequests")) || [];
-        requestQueue.push(data);
         localStorage.setItem("pendingRequests", JSON.stringify(requestQueue));
     }
+}
 
-    // Retry requests when backend is available
-    async function retryRequests() {
-        const requestQueue = JSON.parse(localStorage.getItem("pendingRequests")) || [];
-
-        if (requestQueue.length > 0) {
-            console.log(`Retrying ${requestQueue.length} stored requests...`);
-            for (let i = 0; i < requestQueue.length; i++) {
-                try {
-                    const response = await fetch("https://grisales-github-io.onrender.com/send-email/", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(requestQueue[i]),
-                    });
-
-                    if (response.ok) {
-                        console.log("Stored request sent successfully!");
-                        requestQueue.splice(i, 1);
-                        i--; // Adjust index after removing item
-                    }
-                } catch (error) {
-                    console.error("Backend still down, keeping requests stored.");
-                    break; // Stop retrying if backend is still unavailable
-                }
-            }
-            localStorage.setItem("pendingRequests", JSON.stringify(requestQueue));
-        }
-    }
-
-    // Retry every 30 seconds
-    setInterval(retryRequests, 30000);
-});
+// Retry every 30 seconds
+setInterval(retryRequests, 30000);
