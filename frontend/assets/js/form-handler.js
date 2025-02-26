@@ -28,8 +28,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 jsonData[key] = value;
             });
 
+            alert("Thank you! We will contact you shortly."); // Immediate feedback
+
             try {
-                const response = await fetch("http://192.168.1.100:8000/send-email/", {
+                const response = await fetch("https://grisales-github-io.onrender.com/send-email/", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -49,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Save request to IndexedDB
+    // Save request to IndexedDB instead of localStorage
     function saveRequestOffline(data) {
         const requestQueue = JSON.parse(localStorage.getItem("pendingRequests")) || [];
         requestQueue.push(data);
@@ -64,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log(`Retrying ${requestQueue.length} stored requests...`);
             for (let i = 0; i < requestQueue.length; i++) {
                 try {
-                    const response = await fetch("http://192.168.1.100:8000/send-email/", {
+                    const response = await fetch("https://grisales-github-io.onrender.com/send-email/", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
