@@ -4,8 +4,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const showFormButton = document.getElementById("showForm");
     const formContainer = document.getElementById("quoteFormContainer");
     const quoteForm = document.getElementById("quoteForm");
-    let hasAttempted = false; // Prevent multiple submissions
 
+    // Ensure button and form container exist
     if (showFormButton && formContainer) {
         showFormButton.addEventListener("click", function (event) {
             event.preventDefault();
@@ -19,44 +19,42 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("showForm or quoteFormContainer not found!");
     }
 
+    // Handle form submission
     if (quoteForm) {
-        quoteForm.addEventListener("submit", function (event) {
-            event.preventDefault();
+        quoteForm.addEventListener("submit", async function (event) {
+            event.preventDefault(); // Prevent form from reloading the page
 
-            if (hasAttempted) {
-                console.log("Request already sent or in progress. Ignoring duplicate attempt.");
-                return;
-            }
+            const formData = new FormData(quoteForm);
+            console.log("Submitting form...");
 
-            hasAttempted = true; // Prevents multiple requests
-
-            console.log("Form submitted. Waiting 50 seconds before sending...");
-
-            setTimeout(async function () {
-                const formData = new FormData(quoteForm);
-                const jsonData = {};
-                formData.forEach((value, key) => {
-                    jsonData[key] = value;
+            try {
+                const response = await fetch("https://speedytransportation.pro/send-email/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: new URLSearchParams(formData).toString(),
                 });
 
+                let result;
                 try {
-                    const response = await fetch("https://grisales-github-io.onrender.com/send-email/", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(jsonData),
-                    });
-
-                    if (response.ok) {
-                        console.log("Email sent successfully!");
-                    } else {
-                        console.error("Failed to send email. Backend might be down.");
-                    }
-                } catch (error) {
-                    console.error("Error sending request:", error);
+                    result = await response.json(); // Try parsing JSON response
+                } catch (jsonError) {
+                    console.error("Invalid JSON response:", jsonError);
+                    throw new Error("Server returned an invalid response");
                 }
-            }, 50000); // 50 seconds delay
+
+                if (response.ok) {
+                    alert("Success: " + (result.message || "Email sent successfully!"));
+                } else {
+                    alert("Error: " + (result.error || "An error occurred"));
+                }
+            } catch (error) {
+                alert("Failed to send quote request. Try again later.");
+                console.error("Fetch error:", error);
+            }
         });
+    } else {
+        console.error("quoteForm not found!");
     }
 });
