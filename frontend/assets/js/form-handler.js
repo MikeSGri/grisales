@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("Submitting form...");
 
             try {
-                const response = await fetch("https://speedytransportation.pro/send-email/", {
+                const response = await fetch("https://grisales-github-io.onrender.com/send-email/", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
