@@ -1,45 +1,62 @@
-async function retryRequests() {
-    let requestQueue = JSON.parse(localStorage.getItem("pendingRequests")) || [];
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("JavaScript Loaded Successfully");
 
-    if (requestQueue.length > 0) {
-        console.log(`Retrying ${requestQueue.length} stored requests...`);
+    const showFormButton = document.getElementById("showForm");
+    const formContainer = document.getElementById("quoteFormContainer");
+    const quoteForm = document.getElementById("quoteForm");
+    let hasAttempted = false; // Prevent multiple submissions
 
-        for (let i = 0; i < requestQueue.length; i++) {
-            let request = requestQueue[i];
+    if (showFormButton && formContainer) {
+        showFormButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            console.log("Button clicked!");
+            formContainer.style.display =
+                formContainer.style.display === "none" || formContainer.style.display === ""
+                    ? "block"
+                    : "none";
+        });
+    } else {
+        console.error("showForm or quoteFormContainer not found!");
+    }
 
-            // Stop retrying after 3 attempts
-            if (request.retryCount >= 3) {
-                console.error("Max retries reached for:", request);
-                requestQueue.splice(i, 1); // Remove it from the queue
-                i--; // Adjust index after removal
-                continue;
+    if (quoteForm) {
+        quoteForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            if (hasAttempted) {
+                console.log("Request already sent or in progress. Ignoring duplicate attempt.");
+                return;
             }
 
-            try {
-                const response = await fetch("https://grisales-github-io.onrender.com/send-email/", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(request),
+            hasAttempted = true; // Prevents multiple requests
+
+            console.log("Form submitted. Waiting 50 seconds before sending...");
+
+            setTimeout(async function () {
+                const formData = new FormData(quoteForm);
+                const jsonData = {};
+                formData.forEach((value, key) => {
+                    jsonData[key] = value;
                 });
 
-                if (response.ok) {
-                    console.log("Stored request sent successfully!");
-                    requestQueue.splice(i, 1); // Remove successful request
-                    i--; // Adjust index after removal
-                } else {
-                    request.retryCount += 1; // Increment retry counter
+                try {
+                    const response = await fetch("https://grisales-github-io.onrender.com/send-email/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(jsonData),
+                    });
+
+                    if (response.ok) {
+                        console.log("Email sent successfully!");
+                    } else {
+                        console.error("Failed to send email. Backend might be down.");
+                    }
+                } catch (error) {
+                    console.error("Error sending request:", error);
                 }
-            } catch (error) {
-                console.error("Backend still down, keeping requests stored.");
-                request.retryCount += 1; // Increment retry counter
-            }
-        }
-
-        localStorage.setItem("pendingRequests", JSON.stringify(requestQueue));
+            }, 50000); // 50 seconds delay
+        });
     }
-}
-
-// Retry every 30 seconds
-setInterval(retryRequests, 30000);
+});
